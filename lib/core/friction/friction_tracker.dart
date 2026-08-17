@@ -45,19 +45,22 @@ class FrictionTracker {
     if (lastInteraction == null) return;
 
     final duration = DateTime.now().difference(lastInteraction);
+    final timestamp = DateTime.now().toUtc();
     
     final event = FrictionEvent(
       eventId: _generateEventId(),
       fieldId: fieldId,
       duration: duration,
-      timestamp: DateTime.now(),
+      timestamp: timestamp,
       type: FrictionEventType.fieldStall,
     );
 
     _events.add(event);
     onFrictionEvent(event);
     
-    print('FRICTION: Stall detected on field "$fieldId" - ${duration.inSeconds}s');
+    // Format: [UI_FRICTION_LOG] Timestamp: 2026-08-07T11:31:05Z | Field: parent_consent_code | Hesitation Duration: 5.2s
+    final durationSeconds = duration.inMilliseconds / 1000.0;
+    print('[UI_FRICTION_LOG] Timestamp: ${timestamp.toIso8601String()} | Field: $fieldId | Hesitation Duration: ${durationSeconds}s');
   }
 
   /// Clear all timers and state
